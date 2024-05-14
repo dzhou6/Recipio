@@ -1,6 +1,6 @@
 from allrecipes import AllRecipes
 import pandas as pd
-
+import Recipio
 # Ask for ingredients
 def ingredientInput(ingredients):
     # Ask user for ingredients list and keep going
@@ -110,5 +110,5 @@ def main():
     filtered_data = filtered_data.sort_values(by='rate', ascending=False)
     print(filtered_data)
     query_result = AllRecipes.search(query)
-
 main()
+    Recipio.gen_recipe()
