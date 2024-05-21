@@ -31,33 +31,40 @@ def to_markdown(text):
   text = text.replace('•', '  *')
   return Markdown(textwrap.indent(text, '> ', predicate=lambda _: True))
 #this is the function that we're gonna use to run the image recognition thing
-def gen_recipe(image):
-
+def imager(image):
     model = genai.GenerativeModel('gemini-pro-vision')
-    response = model.generate_content(["Generate a list of the ingredients provided in the following image", image], stream=False)
+    response = model.generate_content(["Generate a list of the ingredients provided in the following image using * as bulletpoints", image], stream=False)
     to_markdown(response.text)
     print(response.text)
+    userinput(response)
+#this is the function that represents response generation
+def userinput(contents):
     userResponse=input("Is this what you are looking for? [Yes or No]")
     if(userResponse=="No"):
         #if sensitive topic or first candidate not sufficient
         print("Here are alternatives or why you might not see something: ")
-        print(response.candidates)
-        response.prompt_feedback
+        print(contents.candidates)
+        contents.prompt_feedback
     elif(userResponse=="Yes"):
         #the output should be an array of all the ingredients
-        hold= []
+        hold=[]
         ret=[]
-        for token in response.text:
+        for token in contents.text:
             if(token.find(":")==-1 and not token=="*"):
                 hold.append(token)
+            #if the current token is a newline or the last element
             if(token=="\n"):
                 ret.append(''.join(hold[:-1]))
                 hold=[]
+            if(token is contents.text[-1]):
+                ret.append(''.join(hold))
         print(ret)
         return ret
     else:
       #potential solution: gen_recipe(image)?
-        print("tbd, maybe try again")
+        print("Please enter either Yes or No")
+        userinput(contents)
+
 def process_image(image):
     image.show()  # Display the processed image
 '''
@@ -66,8 +73,8 @@ bucket = client.get_bucket('Downloads')
 blob = bucket.get_blob('spices.jpeg')
 blob.download_to_filename('spices.jpeg')
 '''
-image_path = "/content/spices.jpg"
+image_path = "/spices.jpeg"
 input_image = Image.open(image_path)
 process_image(input_image)
-gen_recipe(input_image)
-print("gen_recipe passed?")
+imager(input_image)
+print("imager passed?")
