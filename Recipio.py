@@ -2,6 +2,7 @@
 import pathlib
 import textwrap
 import google.generativeai as genai
+import allrecipesdatabase as ardb
 #"set the environment variable, Replace /path/to/your/credentials.json with the actual path to your Google Cloud credentials file."
 import os
 #os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '%APPDATA%\gcloud\application_default_credentials.json'
@@ -32,7 +33,7 @@ def to_markdown(text):
   return Markdown(textwrap.indent(text, '> ', predicate=lambda _: True))
 #this is the function that we're gonna use to run the image recognition thing
 def imager(image):
-    model = genai.GenerativeModel('gemini-pro-vision')
+    model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content(["Generate a list of the ingredients provided in the following image using * as bulletpoints", image], stream=False)
     to_markdown(response.text)
     print(response.text)
@@ -50,21 +51,28 @@ def userinput(contents):
         hold=[]
         ret=[]
         for token in contents.text:
-            if(token.find(":")==-1 and not token=="*"):
+            if((token.isalpha or token.isspace()) and not token=="*"):
                 hold.append(token)
             #if the current token is a newline or the last element
             if(token=="\n"):
                 ret.append(''.join(hold[:-1]))
                 hold=[]
-            if(token is contents.text[-1]):
-                ret.append(''.join(hold))
+            #if(token is contents.text[-1]):
+                #ret.append(''.join(hold))
         print(ret)
+        for i,x in enumerate(ret):
+            if(x=='' or len(x)==1 or len(x)==2):
+                ret.pop(i);
         return ret
     else:
       #potential solution: gen_recipe(image)?
         print("Please enter either Yes or No")
         userinput(contents)
-
+#This is the function where you interact with the backend (aka the allrecipesdatabase)        
+def store(arr):
+    #hold holds the resulting array with parsed ingredients
+    hold=imager(image)
+    ardb.getIngredientList(hold)
 def process_image(image):
     image.show()  # Display the processed image
 '''
@@ -73,7 +81,7 @@ bucket = client.get_bucket('Downloads')
 blob = bucket.get_blob('spices.jpeg')
 blob.download_to_filename('spices.jpeg')
 '''
-image_path = "/spices.jpeg"
+image_path = "spices.jpeg"
 input_image = Image.open(image_path)
 process_image(input_image)
 imager(input_image)
