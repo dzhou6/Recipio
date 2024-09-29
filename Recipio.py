@@ -3,6 +3,7 @@ import pathlib
 import textwrap
 import google.generativeai as genai
 import allrecipesdatabase as ardb
+import sys;
 #"set the environment variable, Replace /path/to/your/credentials.json with the actual path to your Google Cloud credentials file."
 import os
 #os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '%APPDATA%\gcloud\application_default_credentials.json'
@@ -55,24 +56,25 @@ def userinput(contents):
                 hold.append(token)
             #if the current token is a newline or the last element
             if(token=="\n"):
-                ret.append(''.join(hold[:-1]))
+                ret.append(''.join(hold[:]))
                 hold=[]
             #if(token is contents.text[-1]):
                 #ret.append(''.join(hold))
         print(ret)
         for i,x in enumerate(ret):
             if(x=='' or len(x)==1 or len(x)==2):
-                ret.pop(i);
+                ret.pop(i)
         return ret
     else:
       #potential solution: gen_recipe(image)?
         print("Please enter either Yes or No")
         userinput(contents)
 #This is the function where you interact with the backend (aka the allrecipesdatabase)        
-def store(arr):
+def store(image):
     #hold holds the resulting array with parsed ingredients
     hold=imager(image)
-    ardb.getIngredientList(hold)
+    sys.stdin="PICTURE\n"+hold
+    ardb.main()
 def process_image(image):
     image.show()  # Display the processed image
 '''
