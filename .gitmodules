@@ -1,0 +1,3 @@
+[submodule "generative-ai-python"]
+	path = generative-ai-python
+	url = https://github.com/dzhou6/Recipio.git
