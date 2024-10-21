@@ -18,12 +18,12 @@ credentials = service_account.Credentials.from_service_account_file(
 #from google.cloud import storage
 #client = storage.Client(credentials=credentials)
 import configparser
-from google.colab import userdata
+#from google.colab import userdate
 from IPython.display import display
 from IPython.display import Markdown
 
 #api key
-GOOGLE_API_KEY=userdata.get('GOOGLE_API_KEY')
+GOOGLE_API_KEY="YOUR_API_KEY_HERE"
 genai.configure(api_key=GOOGLE_API_KEY)
 
 from PIL import Image
@@ -56,7 +56,7 @@ def userinput(contents):
                 hold.append(token)
             #if the current token is a newline or the last element
             if(token=="\n"):
-                ret.append(''.join(hold[:]))
+                ret.append(''.join(hold[:-1]))
                 hold=[]
             #if(token is contents.text[-1]):
                 #ret.append(''.join(hold))
@@ -83,8 +83,11 @@ bucket = client.get_bucket('Downloads')
 blob = bucket.get_blob('spices.jpeg')
 blob.download_to_filename('spices.jpeg')
 '''
+
 image_path = "spices.jpeg"
 input_image = Image.open(image_path)
+#input_image=Image.open(sys.stdin)
 process_image(input_image)
 imager(input_image)
+#store(input_image)
 print("imager passed?")
